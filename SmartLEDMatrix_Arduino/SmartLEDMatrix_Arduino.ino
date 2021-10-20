@@ -9,6 +9,8 @@
 #define LED_COUNT (LED_WIDTH * LED_HEIGHT)
 #define spc 1
 #define lenshf 0
+#define W 5
+#define H 7
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 MicroDS3231 rtc;
@@ -46,11 +48,22 @@ void loop()
     count = 0;
 }
 
+void drawString(String s, uint32_t color){
+  if(s.length() <= 5){
+    int x = (LED_WIDTH - (s.length()*W + s.length() - 1))/2; 
+    for(int i = 0; i < s.length(); i++){
+      drawSymbol(s[i] - ' ', x, color, 0);
+      x += W + spc;
+    }
+  }
+  strip.show();
+}
+
 // time visualizer
 void drawTime(uint32_t col, int shift)
 {
   String t = rtc.getTimeString().substring(0, 5);
-  length = sizes[t[0] - '0'][0] + sizes[t[1] - '0'][0] + sizes[10][0] + sizes[t[3] - '0'][0] + sizes[t[4] - '0'][0] + 4 * spc;
+  length = W*5 + 4 * spc;
   if (t != prev)
   {
     int lastX = (LED_WIDTH - length) / 2;
@@ -58,12 +71,12 @@ void drawTime(uint32_t col, int shift)
     {
       if (i == 2)
       {
-        lastX += sizes[10][0] + spc;
+        lastX += W + spc;
         continue;
       }
       if (t[i] != prev[i])
-        clear(lastX, 0, sizes[prev[i] - '0'][0], sizes[prev[i] - '0'][1]);
-      lastX += sizes[prev[i] - '0'][0] + spc;
+        clear(lastX, 0, W, H);
+      lastX += W + spc;
     }
     prev = t;
   }
@@ -72,11 +85,11 @@ void drawTime(uint32_t col, int shift)
     clear(0, 0, LED_WIDTH, LED_HEIGHT - 1);
     shift_prev = shift;
   }
-  drawSymbol(prev[0] - '0', (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[1] - '0', sizes[prev[0] - '0'][0] + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(10, sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[3] - '0', sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + sizes[10][0] + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[4] - '0', length - sizes[prev[4] - '0'][0] + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[0] - ' ', (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[1] - ' ', W + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[2] - ' ', W*2 + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[3] - ' ', W*3 + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[4] - ' ', length - W + (LED_WIDTH - length) / 2 - shift, col, 0);
   strip.show();
 }
 
@@ -124,13 +137,11 @@ void clearAllPixels()
 // draw one symbol with code n at start with color
 void drawSymbol(int n, int start, uint32_t color, int wait)
 {
-  int w = 5; // SymbolsSizes[n][0];
-  int h = 7; // SymbolsSizes[n][1];
-  for (int i = 0; i < w; i++)
+  for (int i = 0; i < W; i++)
   {
-    for (int j = 0; j < h; j++)
+    for (int j = 0; j < H; j++)
     {
-      if (Symbols[n][j][i])
+      if (pgm_read_byte(&Symbols[n][j][i]))
       {
         light(cycleX(i + start), cycleY(j), color);
         delay(wait);
