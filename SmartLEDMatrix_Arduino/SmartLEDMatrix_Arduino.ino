@@ -6,6 +6,8 @@
 #define LED_WIDTH 32
 #define LED_HEIGHT 8
 #define LED_COUNT (LED_WIDTH * LED_HEIGHT)
+#define spc 1
+#define lenshf 0
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 MicroDS3231 rtc;
@@ -134,37 +136,77 @@ void setup()
 }
 
 String prev = "";
-uint32_t col_T = strip.Color(0, 0, 255);
+uint32_t col_T = strip.Color(75, 0, 255);
 uint32_t col_else = strip.Color(0, 0, 0);
 int count = 0;
+int shft = 0;
+int length = 0;
+int shift_prev = 0;
+
 void loop()
 {
-  String t = rtc.getTimeString().substring(0, 5);
-  if (t != prev)
-  {
-    clearAllPixels();
-    prev = t;
-  }
-
-  drawSymbol(prev[0] - '0', 0 + 5, col_T, 1);
-  drawSymbol(prev[1] - '0', 5 + 5, col_T, 1);
-  drawSymbol(10, 10 + 5, col_T, 1);
-  drawSymbol(prev[3] - '0', 13 + 5, col_T, 1);
-  drawSymbol(prev[4] - '0', 18 + 5, col_T, 1);
-
   for (int i = 0; i < LED_WIDTH; i++)
     light(i, 7, strip.gamma32(strip.ColorHSV(count + (256 * (i + (LED_WIDTH - 1))) % (5 * 65536))));
-  strip.show();
+  drawTime(col_T, shft/10);
   delay(10);
+  shft += lenshf;
+  if(shft >= 310)
+    shft = 0;
   count += 256;
   if (count >= 5 * 65536)
     count = 0;
+}
+
+// time visualizer
+void drawTime(uint32_t col, int shift)
+{
+  String t = rtc.getTimeString().substring(0, 5);
+  length = sizes[t[0] - '0'][0] + sizes[t[1] - '0'][0] + sizes[10][0] + sizes[t[3] - '0'][0] + sizes[t[4] - '0'][0] + 4 * spc;
+  if (t != prev)
+  {
+    int lastX = (LED_WIDTH - length) / 2;
+    for(int i = 0; i < 5; i++){
+      if(i == 2) { lastX += sizes[10][0] + spc; continue;}
+      if(t[i] != prev[i])
+        clear(lastX, 0, sizes[prev[i] - '0'][0], sizes[prev[i] - '0'][1]);
+      lastX += sizes[prev[i] - '0'][0] + spc;
+    }
+    prev = t;
+  }
+  if(shift != shift_prev){
+    clear(0, 0, LED_WIDTH, LED_HEIGHT-1);
+    shift_prev = shift;
+  }
+  drawSymbol(prev[0] - '0', (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[1] - '0', sizes[prev[0] - '0'][0] + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(10, sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[3] - '0', sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + sizes[10][0] + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[4] - '0', length - sizes[prev[4]-'0'][0] + (LED_WIDTH - length) / 2 - shift, col, 0);
+  strip.show();
+}
+
+int cycleX(int i){
+  return (i < 0 ? LED_WIDTH - (-i % LED_WIDTH) : i % LED_WIDTH);
+}
+
+int cycleY(int j){
+  return (j < 0 ? LED_HEIGHT - (-j % LED_HEIGHT) : j % (LED_HEIGHT-1));
 }
 
 // set i, j pixel to color
 void light(int i, int j, uint32_t color)
 {
   strip.setPixelColor(LED_HEIGHT * i + (i % 2 ? (LED_HEIGHT - 1) - j : j), color);
+}
+
+// set a rectangle of pixels black
+void clear(int x, int y, int w, int h){
+  for(int i = x; i < x + w; i++){
+    for(int j = y; j < y + h; j++){
+      light(i, j, strip.Color(0, 0, 0));
+    }
+  }
+  strip.show();
 }
 
 // set all pixels to black
@@ -190,10 +232,9 @@ void drawSymbol(int n, int start, uint32_t color, int wait)
     {
       if (syms[n][j][i])
       {
-        light(i + start, j, color);
+        light(cycleX(i + start), cycleY(j), color);
         delay(wait);
       }
     }
   }
-  strip.show();
 }
