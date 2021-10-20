@@ -36,10 +36,10 @@ void loop()
 {
   for (int i = 0; i < LED_WIDTH; i++)
     light(i, 7, strip.gamma32(strip.ColorHSV(count + (256 * (i + (LED_WIDTH - 1))) % (5 * 65536))));
-  drawTime(col_T, shft/10);
+  drawTime(col_T, shft / 10);
   delay(10);
   shft += lenshf;
-  if(shft >= 310)
+  if (shft >= 310)
     shft = 0;
   count += 256;
   if (count >= 5 * 65536)
@@ -54,32 +54,40 @@ void drawTime(uint32_t col, int shift)
   if (t != prev)
   {
     int lastX = (LED_WIDTH - length) / 2;
-    for(int i = 0; i < 5; i++){
-      if(i == 2) { lastX += sizes[10][0] + spc; continue;}
-      if(t[i] != prev[i])
+    for (int i = 0; i < 5; i++)
+    {
+      if (i == 2)
+      {
+        lastX += sizes[10][0] + spc;
+        continue;
+      }
+      if (t[i] != prev[i])
         clear(lastX, 0, sizes[prev[i] - '0'][0], sizes[prev[i] - '0'][1]);
       lastX += sizes[prev[i] - '0'][0] + spc;
     }
     prev = t;
   }
-  if(shift != shift_prev){
-    clear(0, 0, LED_WIDTH, LED_HEIGHT-1);
+  if (shift != shift_prev)
+  {
+    clear(0, 0, LED_WIDTH, LED_HEIGHT - 1);
     shift_prev = shift;
   }
   drawSymbol(prev[0] - '0', (LED_WIDTH - length) / 2 - shift, col, 0);
   drawSymbol(prev[1] - '0', sizes[prev[0] - '0'][0] + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
   drawSymbol(10, sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
   drawSymbol(prev[3] - '0', sizes[prev[0] - '0'][0] + sizes[prev[1] - '0'][0] + sizes[10][0] + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[4] - '0', length - sizes[prev[4]-'0'][0] + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[4] - '0', length - sizes[prev[4] - '0'][0] + (LED_WIDTH - length) / 2 - shift, col, 0);
   strip.show();
 }
 
-int cycleX(int i){
+int cycleX(int i)
+{
   return (i < 0 ? LED_WIDTH - (-i % LED_WIDTH) : i % LED_WIDTH);
 }
 
-int cycleY(int j){
-  return (j < 0 ? LED_HEIGHT - (-j % LED_HEIGHT) : j % (LED_HEIGHT-1));
+int cycleY(int j)
+{
+  return (j < 0 ? LED_HEIGHT - (-j % LED_HEIGHT) : j % (LED_HEIGHT - 1));
 }
 
 // set i, j pixel to color
@@ -89,9 +97,12 @@ void light(int i, int j, uint32_t color)
 }
 
 // set a rectangle of pixels black
-void clear(int x, int y, int w, int h){
-  for(int i = x; i < x + w; i++){
-    for(int j = y; j < y + h; j++){
+void clear(int x, int y, int w, int h)
+{
+  for (int i = x; i < x + w; i++)
+  {
+    for (int j = y; j < y + h; j++)
+    {
       light(i, j, strip.Color(0, 0, 0));
     }
   }
