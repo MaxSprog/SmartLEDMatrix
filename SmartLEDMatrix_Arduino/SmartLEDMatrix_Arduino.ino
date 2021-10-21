@@ -30,18 +30,18 @@ String prev = "";
 uint32_t col_T = strip.Color(75, 0, 255);
 uint32_t col_else = strip.Color(0, 0, 0);
 int count = 0;
-int shft = 0;
-int length = 0;
+double shft = 0;
+int length_date = W*5 + 4 * spc;
 int shift_prev = 0;
 
 void loop()
 {
   for (int i = 0; i < LED_WIDTH; i++)
     light(i, 7, strip.gamma32(strip.ColorHSV(count + (256 * (i + (LED_WIDTH - 1))) % (5 * 65536))));
-  drawTime(col_T, shft / 10);
+  drawTime(col_T, (int)shft / 10);
   delay(10);
   shft += lenshf;
-  if (shft >= 310)
+  if (shft >= 320)
     shft = 0;
   count += 256;
   if (count >= 5 * 65536)
@@ -63,33 +63,28 @@ void drawString(String s, uint32_t color){
 void drawTime(uint32_t col, int shift)
 {
   String t = rtc.getTimeString().substring(0, 5);
-  length = W*5 + 4 * spc;
-  if (t != prev)
-  {
-    int lastX = (LED_WIDTH - length) / 2;
-    for (int i = 0; i < 5; i++)
-    {
-      if (i == 2)
-      {
-        lastX += W + spc;
-        continue;
-      }
-      if (t[i] != prev[i])
-        clear(lastX, 0, W, H);
-      lastX += W + spc;
-    }
-    prev = t;
-  }
   if (shift != shift_prev)
   {
     clear(0, 0, LED_WIDTH, LED_HEIGHT - 1);
     shift_prev = shift;
+    int lastX = (LED_WIDTH - length_date) / 2;
+    for (int i = 0; i < 5; i++)
+    {
+      drawSymbol(t[i] - ' ', lastX - shift, col, 0);
+      lastX += W + spc;
+    }
   }
-  drawSymbol(prev[0] - ' ', (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[1] - ' ', W + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[2] - ' ', W*2 + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[3] - ' ', W*3 + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[4] - ' ', length - W + (LED_WIDTH - length) / 2 - shift, col, 0);
+  else if (t != prev)
+  {
+    int lastX = (LED_WIDTH - length_date) / 2;
+    for (int i = 0; i < 5; i++)
+    {
+      if (t[i] != prev[i])
+        drawSymbol(t[i] - ' ', lastX - shift, col, 0);
+      lastX += W + spc;
+    }
+    prev = t;
+  }
   strip.show();
 }
 
@@ -119,7 +114,7 @@ void clear(int x, int y, int w, int h)
       light(i, j, strip.Color(0, 0, 0));
     }
   }
-  strip.show();
+  // strip.show();
 }
 
 // set all pixels to black
@@ -145,6 +140,9 @@ void drawSymbol(int n, int start, uint32_t color, int wait)
       {
         light(cycleX(i + start), cycleY(j), color);
         delay(wait);
+      }
+      else{
+        light(cycleX(i + start), cycleY(j), strip.Color(0,0,0));
       }
     }
   }

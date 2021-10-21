@@ -3,7 +3,7 @@
 
 int SymbolsSizes[2] = {5, 7};
 
-const bool Symbols[94][7][5] PROGMEM = {
+const bool Symbols[95][7][5] PROGMEM = {
 	{// 
 		{0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0},
@@ -849,7 +849,7 @@ const bool Symbols[94][7][5] PROGMEM = {
 		{0, 0, 1, 0, 0},
 		{0, 0, 1, 0, 0},
 		{0, 1, 0, 0, 0},
-	},
+	}
 };
 
 #endif
