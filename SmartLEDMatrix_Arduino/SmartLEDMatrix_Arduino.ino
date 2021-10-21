@@ -24,6 +24,9 @@ void setup()
   strip.setBrightness(LED_BRIGHTNESS);
 
   clearAllPixels();
+  drawString("~~~~~", strip.Color(255,255,255));
+  strip.show();
+  delay(10000);
 }
 
 String prev = "";
@@ -31,7 +34,7 @@ uint32_t col_T = strip.Color(75, 0, 255);
 uint32_t col_else = strip.Color(0, 0, 0);
 int count = 0;
 double shft = 0;
-int length_date = W*5 + 4 * spc;
+int length_date = W*5 + 4 * SPC;
 int shift_prev = 0;
 
 void loop()
@@ -74,7 +77,7 @@ void drawTime(uint32_t col, int shift)
     for (int i = 0; i < 5; i++)
     {
       drawSymbol(t[i] - ' ', lastX - shift, col, 0);
-      lastX += W + spc;
+      lastX += W + SPC;
     }
   }
   else if (t != prev)
@@ -84,7 +87,7 @@ void drawTime(uint32_t col, int shift)
     {
       if (t[i] != prev[i])
         drawSymbol(t[i] - ' ', lastX - shift, col, 0);
-      lastX += W + spc;
+      lastX += W + SPC;
     }
     prev = t;
   }
@@ -124,7 +127,7 @@ void clear(int x, int y, int w, int h)
 void clearAllPixels()
 {
   for (int i = 0; i < strip.numPixels(); i++)
-    strip.setPixelColor(i, strip.Color(0, 0, 0));
+    strip.setPixelColor(i, strip.Color(255, 0, 0));
   strip.show();
 }
 
@@ -145,7 +148,7 @@ void drawSymbol(int n, int start, uint32_t color, int wait)
         delay(wait);
       }
       else{
-        light(cycleX(i + start), cycleY(j), strip.Color(0,0,0));
+        light(cycleX(i + start), cycleY(j), strip.Color(255,0,0));
       }
     }
   }
