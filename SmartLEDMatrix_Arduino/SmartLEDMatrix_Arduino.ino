@@ -7,8 +7,8 @@
 #define LED_WIDTH 32
 #define LED_HEIGHT 8
 #define LED_COUNT (LED_WIDTH * LED_HEIGHT)
-#define spc 1
-#define lenshf 0
+#define SPC 1
+#define LENSHF 0
 #define W 5
 #define H 7
 
@@ -40,7 +40,7 @@ void loop()
     light(i, 7, strip.gamma32(strip.ColorHSV(count + (256 * (i + (LED_WIDTH - 1))) % (5 * 65536))));
   drawTime(col_T, shft / 10);
   delay(10);
-  shft += lenshf;
+  shft += LENSHF;
   if (shft >= 310)
     shft = 0;
   count += 256;
@@ -48,12 +48,15 @@ void loop()
     count = 0;
 }
 
-void drawString(String s, uint32_t color){
-  if(s.length() <= 5){
-    int x = (LED_WIDTH - (s.length()*W + s.length() - 1))/2; 
-    for(int i = 0; i < s.length(); i++){
+void drawString(String s, uint32_t color)
+{
+  if (s.length() <= 5)
+  {
+    int x = (LED_WIDTH - (s.length() * W + s.length() - 1)) / 2;
+    for (int i = 0; i < s.length(); i++)
+    {
       drawSymbol(s[i] - ' ', x, color, 0);
-      x += W + spc;
+      x += W + SPC;
     }
   }
   strip.show();
@@ -63,7 +66,7 @@ void drawString(String s, uint32_t color){
 void drawTime(uint32_t col, int shift)
 {
   String t = rtc.getTimeString().substring(0, 5);
-  length = W*5 + 4 * spc;
+  length = W * 5 + 4 * SPC;
   if (t != prev)
   {
     int lastX = (LED_WIDTH - length) / 2;
@@ -71,12 +74,12 @@ void drawTime(uint32_t col, int shift)
     {
       if (i == 2)
       {
-        lastX += W + spc;
+        lastX += W + SPC;
         continue;
       }
       if (t[i] != prev[i])
         clear(lastX, 0, W, H);
-      lastX += W + spc;
+      lastX += W + SPC;
     }
     prev = t;
   }
@@ -86,9 +89,9 @@ void drawTime(uint32_t col, int shift)
     shift_prev = shift;
   }
   drawSymbol(prev[0] - ' ', (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[1] - ' ', W + spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[2] - ' ', W*2 + 2 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[3] - ' ', W*3 + 3 * spc + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[1] - ' ', W + SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[2] - ' ', W * 2 + 2 * SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
+  drawSymbol(prev[3] - ' ', W * 3 + 3 * SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
   drawSymbol(prev[4] - ' ', length - W + (LED_WIDTH - length) / 2 - shift, col, 0);
   strip.show();
 }
