@@ -66,31 +66,15 @@ void drawString(String s, uint32_t color)
 void drawTime(uint32_t col, int shift)
 {
   String t = rtc.getTimeString().substring(0, 5);
-<<<<<<< HEAD
   if (shift != shift_prev)
-=======
-  length = W * 5 + 4 * SPC;
-  if (t != prev)
->>>>>>> 270767534df2d578c4a5e3a23b4cfca2d10d4248
   {
     clear(0, 0, LED_WIDTH, LED_HEIGHT - 1);
     shift_prev = shift;
     int lastX = (LED_WIDTH - length_date) / 2;
     for (int i = 0; i < 5; i++)
     {
-<<<<<<< HEAD
       drawSymbol(t[i] - ' ', lastX - shift, col, 0);
       lastX += W + spc;
-=======
-      if (i == 2)
-      {
-        lastX += W + SPC;
-        continue;
-      }
-      if (t[i] != prev[i])
-        clear(lastX, 0, W, H);
-      lastX += W + SPC;
->>>>>>> 270767534df2d578c4a5e3a23b4cfca2d10d4248
     }
   }
   else if (t != prev)
@@ -104,14 +88,6 @@ void drawTime(uint32_t col, int shift)
     }
     prev = t;
   }
-<<<<<<< HEAD
-=======
-  drawSymbol(prev[0] - ' ', (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[1] - ' ', W + SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[2] - ' ', W * 2 + 2 * SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[3] - ' ', W * 3 + 3 * SPC + (LED_WIDTH - length) / 2 - shift, col, 0);
-  drawSymbol(prev[4] - ' ', length - W + (LED_WIDTH - length) / 2 - shift, col, 0);
->>>>>>> 270767534df2d578c4a5e3a23b4cfca2d10d4248
   strip.show();
 }
 
